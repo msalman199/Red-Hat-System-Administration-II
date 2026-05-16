@@ -1,0 +1,54 @@
+Task 1: Scheduling a One-Time Backup Task
+Subtask 1.1: Create a Simple Backup Script
+Create a backup directory:
+
+mkdir ~/backups
+Create a backup script:
+
+nano ~/backup_script.sh
+Add the following content:
+
+#!/bin/bash
+echo "Backup started at $(date)" >> ~/backups/backup_log.txt
+tar -czf ~/backups/home_backup_$(date +%Y%m%d).tar.gz ~/Documents
+echo "Backup completed at $(date)" >> ~/backups/backup_log.txt
+Make the script executable:
+
+chmod +x ~/backup_script.sh
+Subtask 1.2: Schedule the Backup with at
+Schedule the backup to run in 5 minutes:
+
+at now + 5 minutes -f ~/backup_script.sh
+Press Ctrl+D to save the job
+Verify the scheduled job:
+
+atq
+Expected Output: Shows your scheduled job with job ID
+
+Subtask 1.3: Alternative Time Formats
+Try different scheduling formats:
+
+at 11:30 PM tomorrow
+at 9:00 AM next week
+at now + 1 hour
+Task 2: Managing Scheduled Tasks
+Subtask 2.1: List Scheduled Jobs
+View all pending jobs:
+atq
+Expected Output: Lists job ID, date/time, and queue
+Subtask 2.2: Remove a Scheduled Job
+Identify the job ID from atq output
+Remove a specific job:
+atrm <job_id>
+Subtask 2.3: View Job Details
+For advanced users: View the contents of a scheduled job
+sudo ls /var/spool/at
+sudo cat /var/spool/at/<job_file>
+Troubleshooting Tips
+If at commands don't work:
+Verify atd service is running: systemctl status atd
+Check system logs: journalctl -u atd
+Permission issues:
+Ensure your user is in /etc/at.allow (or not in /etc/at.deny)
+Timezone problems:
+Verify system time: timedatectl
