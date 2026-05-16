@@ -1,0 +1,79 @@
+Task 1: Create a Tarball with tar to Archive Files
+Objective: Combine multiple files into a single .tar archive.
+
+Subtask 1.1: Create Sample Files
+Open a terminal.
+Create a directory and some sample files:
+mkdir lab_files
+cd lab_files
+touch file1.txt file2.txt file3.txt
+echo "This is file1" > file1.txt
+echo "This is file2" > file2.txt
+echo "This is file3" > file3.txt
+Expected Outcome: Three text files (file1.txt, file2.txt, file3.txt) are created in the lab_files directory.
+Subtask 1.2: Create a .tar Archive
+Use tar to create an archive:
+
+tar -cvf archive.tar file1.txt file2.txt file3.txt
+-c: Create a new archive.
+-v: Verbose mode (shows progress).
+-f: Specify the archive filename.
+Expected Outcome: A file named archive.tar is created containing the three text files.
+
+Subtask 1.3: Verify the Archive
+List the contents of the archive:
+tar -tvf archive.tar
+Expected Outcome: The terminal displays the list of archived files (file1.txt, file2.txt, file3.txt).
+Task 2: Compress the Tarball with gzip or bzip2
+Objective: Reduce the size of the .tar archive using compression.
+
+Subtask 2.1: Compress with gzip
+Compress the .tar file using gzip:
+
+gzip archive.tar
+Expected Outcome: A compressed file archive.tar.gz is created.
+
+Verify the compressed file:
+
+ls -lh archive.tar.gz
+Expected Outcome: The terminal shows the compressed file size.
+
+Subtask 2.2: Compress with bzip2 (Alternative)
+Recreate the .tar file (since gzip modified it):
+
+tar -cvf archive.tar file1.txt file2.txt file3.txt
+Compress with bzip2:
+
+bzip2 archive.tar
+Expected Outcome: A compressed file archive.tar.bz2 is created.
+
+Compare file sizes:
+
+ls -lh archive.tar.*
+Expected Outcome: Both .gz and .bz2 compressed files are listed with their sizes.
+
+Task 3: Extract and List Files from an Existing Tar Archive
+Objective: Retrieve files from a compressed or uncompressed .tar archive.
+
+Subtask 3.1: Extract a .tar Archive
+Extract the original archive.tar:
+tar -xvf archive.tar
+Expected Outcome: The files (file1.txt, file2.txt, file3.txt) are extracted to the current directory.
+Subtask 3.2: Extract a .tar.gz Archive
+Extract the gzip-compressed archive:
+
+tar -xzvf archive.tar.gz
+-z: Decompress using gzip.
+Expected Outcome: The files are extracted successfully.
+
+Subtask 3.3: Extract a .tar.bz2 Archive
+Extract the bzip2-compressed archive:
+
+tar -xjvf archive.tar.bz2
+-j: Decompress using bzip2.
+Expected Outcome: The files are extracted successfully.
+
+Troubleshooting Tips
+"No such file or directory": Ensure the files being archived exist in the specified path.
+Permission issues: Use sudo if required, or check file permissions with ls -l.
+Corrupt archive: Recreate the archive if extraction fails.
