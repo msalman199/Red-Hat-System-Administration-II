@@ -1,0 +1,57 @@
+Setup Requirements
+Open a terminal window
+Create a practice directory:
+mkdir command_substitution_lab
+cd command_substitution_lab
+Create sample files for the exercises:
+touch file1.txt file2.log data.csv config.ini backup.tar.gz
+Task 1: Basic Command Substitution
+Subtask 1.1: Using $() syntax
+Execute a simple command substitution:
+
+echo "Today is $(date)"
+Expected Output: Current date in the format "Today is [current date]"
+Count files in your directory using substitution:
+
+echo "There are $(ls | wc -l) files in this directory"
+Subtask 1.2: Using backtick syntax
+Repeat the date example with backticks:
+
+echo "Today is `date`"
+Key Concept: Backticks are the older syntax, while $() is preferred for readability and nesting
+Compare the two methods:
+
+echo "Test 1: $(echo $(date))"
+echo "Test 2: `echo \`date\``"
+Troubleshooting: If you get unexpected output, check for proper nesting and escaping
+Task 2: Dynamic File Operations
+Subtask 2.1: Finding and processing files
+Find all .txt files and display their contents:
+
+cat $(find . -name "*.txt")
+Count lines in all log files:
+
+wc -l $(find . -name "*.log")
+Subtask 2.2: Advanced file operations
+Create a backup of all configuration files:
+
+tar czf config_backup_$(date +%Y%m%d).tar.gz $(find . -name "*.ini")
+Explanation: The date is substituted to create a unique filename
+Check disk usage of found files:
+
+du -h $(find . -size +1M)
+Task 3: Building Command Pipelines
+Subtask 3.1: Simple pipeline with substitution
+Count the number of running processes:
+
+echo "There are $(ps aux | wc -l) processes running"
+Find the largest file in directory:
+
+ls -S | head -n 1
+Subtask 3.2: Nested command substitution
+Get the modification time of the newest file:
+
+echo "Newest file was modified at $(date -r $(ls -t | head -n 1))"
+Complex pipeline example:
+
+echo "The largest file is $(du -h $(find . -type f) | sort -h | tail -n 1)"
