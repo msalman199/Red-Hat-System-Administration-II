@@ -1,0 +1,73 @@
+1. Ensure logrotate is installed:
+   ```bash
+   sudo dnf install logrotate -y  # RHEL/CentOS/Fedora
+Verify installation:
+logrotate --version
+Task 1: Edit logrotate.conf for Custom Log Rotation Settings
+Subtask 1.1: Examine Default Configuration
+View the main configuration file:
+
+sudo cat /etc/logrotate.conf
+Expected Output: Shows default rotation settings (weekly, rotate 4, etc.)
+Check existing logrotate configurations:
+
+ls /etc/logrotate.d/
+Subtask 1.2: Create Custom Configuration
+Create a new configuration file for system logs:
+
+sudo vim /etc/logrotate.d/mycustomlogs
+Add the following configuration (example for /var/log/syslog):
+
+/var/log/syslog {
+    daily
+    rotate 7
+    compress
+    delaycompress
+    missingok
+    notifempty
+    create 0640 root adm
+    postrotate
+        /usr/bin/systemctl restart rsyslog >/dev/null 2>&1 || true
+    endscript
+}
+Key Parameters:
+daily: Rotate logs daily
+rotate 7: Keep 7 rotated copies
+compress: Use gzip compression
+postrotate: Restart rsyslog after rotation
+Verify syntax:
+
+sudo logrotate --debug /etc/logrotate.d/mycustomlogs
+Troubleshooting: Fix any syntax errors reported
+Task 2: Force Log Rotation Using logrotate
+Subtask 2.1: Manual Rotation Execution
+Force immediate rotation (dry run first):
+
+sudo logrotate --debug --verbose --force /etc/logrotate.d/mycustomlogs
+Execute actual rotation:
+
+sudo logrotate --force /etc/logrotate.d/mycustomlogs
+Subtask 2.2: Verify Rotation
+Check rotated files:
+ls -lh /var/log/syslog*
+Expected Outcome: Should show original log plus rotated files (e.g., syslog.1.gz)
+Task 3: Test and Check Log Rotation Effects
+Subtask 3.1: Simulate Log Growth
+Generate test log entries:
+
+for i in {1..1000}; do echo "Test log entry $i" | sudo tee -a /var/log/syslog; done
+Check log size:
+
+du -sh /var/log/syslog
+Subtask 3.2: Trigger and Verify Rotation
+Run rotation again:
+
+sudo logrotate --force /etc/logrotate.d/mycustomlogs
+Verify new rotation:
+
+ls -lh /var/log/syslog*
+Expected Outcome: New rotated file (syslog.1.gz) with original log reset
+Check compression:
+
+file /var/log/syslog.1.gz
+Should show "gzip compressed data"
