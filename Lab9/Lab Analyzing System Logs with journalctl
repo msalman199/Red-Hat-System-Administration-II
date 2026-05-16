@@ -1,0 +1,52 @@
+
+## **Task 1: Query Logs Using journalctl Based on Time and Unit**
+
+### **Subtask 1.1: Display All Logs**
+1. Open a terminal.
+2. Run the following command to display all system logs:
+   ```bash
+   journalctl
+Expected Outcome: A paginated view of all system logs.
+Troubleshooting: If logs are empty, ensure systemd-journald is running (sudo systemctl status systemd-journald).
+Subtask 1.2: Filter Logs by Time
+View logs from the last hour:
+journalctl --since "1 hour ago"
+View logs between two specific times (e.g., 9:00 AM to 10:00 AM):
+journalctl --since "09:00:00" --until "10:00:00"
+Explanation: --since and --until accept absolute (YYYY-MM-DD HH:MM:SS) or relative ("1 hour ago") timestamps.
+Subtask 1.3: Filter Logs by Unit
+View logs for a specific service (e.g., sshd):
+journalctl -u sshd
+Combine time and unit filters:
+journalctl -u sshd --since "today"
+Key Concept: -u filters logs by the systemd unit.
+Task 2: Filter Logs by Priority Level and Boot Session
+Subtask 2.1: Filter by Priority Level
+Show only error-level logs:
+journalctl -p err
+Priority Levels: emerg (0), alert (1), crit (2), err (3), warning (4), notice (5), info (6), debug (7).
+Show logs with priority warning or higher:
+journalctl -p warning..emerg
+Subtask 2.2: Filter by Boot Session
+List all boot sessions:
+journalctl --list-boots
+Output: Displays boot IDs, timestamps, and session numbers.
+View logs from the current boot:
+journalctl -b
+View logs from a specific boot (use the boot ID from --list-boots):
+journalctl -b -1  # Previous boot
+Task 3: Advanced journalctl Options for Detailed Analysis
+Subtask 3.1: Follow Logs in Real-Time
+Monitor new log entries:
+journalctl -f
+Explanation: Similar to tail -f, this streams logs in real-time.
+Subtask 3.2: Output in JSON for Scripting
+Export logs in JSON format:
+journalctl -u sshd --since "1 hour ago" -o json
+Use Case: Useful for parsing logs with tools like jq.
+Subtask 3.3: Show Disk Usage and Vacuum Old Logs
+Check journal disk usage:
+journalctl --disk-usage
+Limit log retention to 100MB:
+sudo journalctl --vacuum-size=100M
+Key Concept: Prevents logs from consuming excessive disk space.
