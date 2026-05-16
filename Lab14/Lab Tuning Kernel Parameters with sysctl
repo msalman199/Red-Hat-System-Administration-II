@@ -1,0 +1,76 @@
+Lab Tasks
+Task 1: Viewing and Modifying Kernel Parameters with sysctl
+Subtask 1.1: View Current Kernel Parameters
+The sysctl command allows you to view and modify kernel parameters at runtime.
+
+List all kernel parameters:
+
+sudo sysctl -a
+Expected Outcome: A long list of kernel parameters with their current values.
+View a specific parameter (e.g., vm.swappiness):
+
+sudo sysctl vm.swappiness
+Expected Outcome: Displays the current value of vm.swappiness (e.g., vm.swappiness = 60).
+Subtask 1.2: Modify a Kernel Parameter Temporarily
+Changes made this way will not persist after a reboot.
+
+Change vm.swappiness to a lower value (e.g., 10):
+
+sudo sysctl -w vm.swappiness=10
+Explanation: Lowering vm.swappiness reduces how aggressively the kernel swaps memory to disk.
+Verify the change:
+
+sudo sysctl vm.swappiness
+Expected Outcome: Output should show vm.swappiness = 10.
+Task 2: Tuning Network and Memory Management Settings
+Subtask 2.1: Optimize Network Performance
+Adjust TCP/IP stack parameters for better throughput.
+
+Increase the maximum number of connections (e.g., net.core.somaxconn):
+
+sudo sysctl -w net.core.somaxconn=1024
+Explanation: This increases the backlog of pending connections.
+Enable TCP Fast Open:
+
+sudo sysctl -w net.ipv4.tcp_fastopen=3
+Explanation: tcp_fastopen=3 enables Fast Open for both client and server.
+Verify changes:
+
+sudo sysctl net.core.somaxconn net.ipv4.tcp_fastopen
+Expected Outcome: Displays updated values.
+Subtask 2.2: Optimize Memory Management
+Adjust virtual memory settings for better performance.
+
+Reduce swap usage tendency (vm.swappiness):
+
+sudo sysctl -w vm.swappiness=10
+Increase file descriptor limits (fs.file-max):
+
+sudo sysctl -w fs.file-max=2097152
+Explanation: Increases the maximum number of open files.
+Verify changes:
+
+sudo sysctl vm.swappiness fs.file-max
+Task 3: Persisting Kernel Changes Across Reboots
+Subtask 3.1: Configure Persistent Kernel Parameters
+To make changes permanent, modify /etc/sysctl.conf or create a new .conf in /etc/sysctl.d/.
+
+Edit /etc/sysctl.conf:
+
+sudo nano /etc/sysctl.conf
+Add the following lines:
+
+vm.swappiness = 10  
+net.core.somaxconn = 1024  
+net.ipv4.tcp_fastopen = 3  
+fs.file-max = 2097152  
+Apply changes without rebooting:
+
+sudo sysctl -p
+Expected Outcome: The changes are reloaded and applied.
+Alternative: Use /etc/sysctl.d/ for modular configs:
+
+sudo nano /etc/sysctl.d/99-custom.conf
+Add the same parameters as above, then apply:
+
+sudo sysctl --system
