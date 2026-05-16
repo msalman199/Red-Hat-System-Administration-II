@@ -1,0 +1,107 @@
+Task 1: Using Ctrl+R for Command History Search
+Subtask 1.1: Basic Reverse Search
+Open your terminal
+
+Type and execute a few random commands to populate history:
+
+echo "Hello World"
+ls -l
+date
+whoami
+Press Ctrl+R to initiate reverse search
+
+Start typing "echo" - you should see the most recent "echo" command appear
+
+Press Enter to execute the found command or press Ctrl+C to cancel
+
+Expected Outcome:
+The most recent matching command appears and can be executed.
+
+Troubleshooting:
+If nothing appears, ensure:
+
+You've actually typed commands first (history must have entries)
+Your terminal supports this key combination
+Try stty -a to verify key bindings
+Subtask 1.2: Navigating Search Results
+Press Ctrl+R again while in search mode to cycle through older matches
+Use Ctrl+S to search forward (may require terminal configuration)
+Press Ctrl+G to exit search without executing anything
+Key Concept:
+Bash search is "reverse" because it starts from the most recent command and goes backward.
+
+Task 2: Advanced History Search Techniques
+Subtask 2.1: Searching for Specific Patterns
+Execute these commands to create diverse history entries:
+
+grep "error" /var/log/syslog
+find ~ -name "*.txt"
+docker ps -a
+Search for commands containing "docker":
+
+Press Ctrl+R
+Type "docker"
+Verify the correct command appears
+Search for commands with both "find" and "name":
+
+Press Ctrl+R
+Type "find name"
+Expected Outcome:
+You can find commands using partial patterns and multiple keywords.
+
+Subtask 2.2: Modifying Found Commands
+Find a command using Ctrl+R
+Before executing:
+Use left/right arrows to move cursor
+Edit the command as needed
+Press Enter to execute modified command
+Example:
+Find ls -l, then modify to ls -la before executing.
+
+Task 3: Creating Custom History Search Aliases
+Subtask 3.1: Permanent History Configuration
+Open your Bash configuration file:
+
+nano ~/.bashrc
+Add these configuration options for enhanced history:
+
+# Increase history size
+HISTSIZE=5000
+HISTFILESIZE=10000
+
+# Append to history instead of overwriting
+shopt -s histappend
+
+# Ignore duplicate commands and space-prefixed commands
+HISTCONTROL=ignoreboth
+Save and apply changes:
+
+source ~/.bashrc
+Subtask 3.2: Creating Search Aliases
+Add these useful aliases to your ~/.bashrc:
+
+# Quick history search aliases
+alias hs='history | grep'
+alias hsi='history | grep -i'
+Apply changes:
+
+source ~/.bashrc
+Test the aliases:
+
+hs docker
+hsi ERROR
+Expected Outcome:
+You can now search history with simple alias commands, with case-sensitive and insensitive options.
+
+Subtask 3.3: Advanced History Management
+Add this function to ~/.bashrc for timestamped history:
+
+function hst {
+  history | awk '{print $2 " " $3 "\t" $4 "\t" $5FS$6FS$7FS$8FS$9FS$10}' | sort | uniq -c | sort -nr | head -n 20
+}
+Apply and test:
+
+source ~/.bashrc
+hst
+Key Concept:
+This shows your 20 most frequently used commands with usage counts.
