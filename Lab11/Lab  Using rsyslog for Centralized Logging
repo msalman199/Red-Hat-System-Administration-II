@@ -1,0 +1,119 @@
+Lab Setup
+For this lab, we'll use:
+
+Server System: 192.168.1.100 (logserver.example.com)
+Client System: 192.168.1.101 (client.example.com)
+Task 1: Install and Configure rsyslog
+Subtask 1.1: Install rsyslog on Both Systems
+On both server and client systems:
+
+# For RHEL/CentOS:
+sudo dnf install -y rsyslog
+
+# For Ubuntu/Debian:
+sudo apt-get update && sudo apt-get install -y rsyslog
+Expected Outcome:
+Rsyslog package is installed without errors.
+
+Troubleshooting Tip:
+If you get package not found errors, ensure your system is registered/subscribed (for RHEL) or has correct repositories (for Ubuntu).
+
+Subtask 1.2: Configure rsyslog Server
+On the server system (192.168.1.100):
+
+Edit the rsyslog configuration file:
+sudo vi /etc/rsyslog.conf
+Uncomment or add these lines:
+module(load="imudp")
+input(type="imudp" port="514")
+
+module(load="imtcp")
+input(type="imtcp" port="514")
+
+$template RemoteLogs,"/var/log/remotehost/%HOST-NAME%/%PROGRAMNAME%.log"
+*.* ?RemoteLogs
+& ~
+Create the log storage directory:
+sudo mkdir -p /var/log/remotehost
+Restart rsyslog and enable firewall:
+sudo systemctl restart rsyslog
+sudo systemctl enable rsyslog
+
+# For firewalld (RHEL/CentOS):
+sudo firewall-cmd --add-port=514/tcp --permanent
+sudo firewall-cmd --add-port=514/udp --permanent
+sudo firewall-cmd --reload
+
+# For ufw (Ubuntu):
+sudo ufw allow 514/tcp
+sudo ufw allow 514/udp
+Expected Outcome:
+Rsyslog server is listening on TCP/UDP port 514 and ready to receive logs.
+
+Task 2: Configure Client to Forward Logs
+Subtask 2.1: Configure rsyslog Client
+On the client system (192.168.1.101):
+
+Edit the rsyslog configuration:
+sudo vi /etc/rsyslog.conf
+Add at the end of file:
+*.* @@192.168.1.100:514  # TCP forwarding
+# OR for UDP:
+# *.* @192.168.1.100:514
+Restart rsyslog:
+sudo systemctl restart rsyslog
+Expected Outcome:
+Client will begin forwarding all system logs to the central server.
+
+Subtask 2.2: Test Log Forwarding
+On client system:
+
+logger "This is a test message from client"
+On server system:
+
+sudo tail -f /var/log/remotehost/client.example.com/logger.log
+Expected Outcome:
+You should see the test message appear in the server's log file.
+
+Task 3: Analyze Centralized Logs
+Subtask 3.1: Using journalctl (if using journald)
+On server system:
+
+journalctl -f
+Expected Outcome:
+Live view of system journal including forwarded logs (if journald is configured to receive syslog).
+
+Subtask 3.2: Using rsyslog Log Files
+On server system:
+
+# View logs from specific client
+sudo ls /var/log/remotehost/client.example.com/
+
+# Search for specific logs
+sudo grep "error" /var/log/remotehost/client.example.com/*.log
+Expected Outcome:
+You can see organized logs from all clients in their respective directories.
+
+Advanced Configuration (Optional)
+Filter Specific Logs
+To forward only specific logs from client:
+
+# In client's /etc/rsyslog.conf
+authpriv.* @@192.168.1.100:514
+*.error @@192.168.1.100:514
+Encrypted Log Transfer
+For secure log transfer:
+
+On both systems:
+sudo dnf install -y rsyslog-gnutls  # or apt-get equivalent
+Configure TLS in rsyslog configuration
+Troubleshooting Common Issues
+Logs not appearing on server:
+
+Verify network connectivity: telnet 192.168.1.100 514
+Check rsyslog status: sudo systemctl status rsyslog
+View rsyslog own logs: sudo tail -f /var/log/messages or /var/log/syslog
+Permission issues:
+
+Ensure /var/log/remotehost has proper permissions
+SELinux might block access: sudo setenforce 0 to test
