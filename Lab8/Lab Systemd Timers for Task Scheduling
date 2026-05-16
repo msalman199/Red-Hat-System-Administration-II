@@ -1,0 +1,89 @@
+Lab Setup
+Verify systemd version:
+systemctl --version
+Check existing timers:
+systemctl list-timers --all
+Task 1: Create and Start a Systemd Timer for System Maintenance
+Subtask 1.1: Create a Service Unit
+Create a service unit file:
+sudo nano /etc/systemd/system/maintenance.service
+Add the following content:
+[Unit]
+Description=System Maintenance Task
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/echo "Performing system maintenance at $(date)" >> /var/log/maintenance.log
+Save and exit the editor
+Subtask 1.2: Create a Timer Unit
+Create the timer unit file:
+sudo nano /etc/systemd/system/maintenance.timer
+Add this configuration:
+[Unit]
+Description=Run maintenance daily
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+Unit=maintenance.service
+
+[Install]
+WantedBy=timers.target
+Subtask 1.3: Enable and Start the Timer
+Reload systemd:
+sudo systemctl daemon-reload
+Enable and start the timer:
+sudo systemctl enable --now maintenance.timer
+Verify the status:
+systemctl status maintenance.timer
+Expected Outcome: Timer is active and will trigger daily. Check /var/log/maintenance.log after 24 hours.
+
+Task 2: Learn How to Create Timer Units
+Subtask 2.1: Understand Timer Specifications
+Key timer directives:
+
+OnCalendar: Calendar event expressions
+OnActiveSec: Relative to timer activation
+OnBootSec: Relative to system boot
+OnUnitActiveSec: Relative to last activation
+Subtask 2.2: Create a Complex Timer
+Create a new timer:
+sudo nano /etc/systemd/system/backup.timer
+Add this configuration:
+[Unit]
+Description=Weekly backup with specific time
+
+[Timer]
+OnCalendar=Mon *-*-* 02:00:00
+Unit=backup.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+Troubleshooting Tip: Test calendar expressions with:
+
+systemd-analyze calendar "Mon *-*-* 02:00:00"
+Task 3: Modify Systemd Timer Settings
+Subtask 3.1: Adjust Existing Timer
+Edit the maintenance timer:
+sudo nano /etc/systemd/system/maintenance.timer
+Modify to run hourly:
+OnCalendar=hourly
+Subtask 3.2: Add Randomized Delay
+Add this to prevent system load spikes:
+RandomizedDelaySec=5m
+Subtask 3.3: Verify Changes
+Reload and check next execution:
+sudo systemctl daemon-reload
+systemctl list-timers
+Monitoring and Troubleshooting
+Check Timer Execution
+journalctl -u maintenance.service
+Verify Timer Accuracy
+systemd-analyze calendar --iterations=5 "hourly"
+Common Issues
+Timer not triggering? Check:
+systemctl status <timer>.timer
+journalctl -xe
+Service not starting? Verify:
+systemctl status <service>.service
