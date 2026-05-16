@@ -1,0 +1,70 @@
+
+## **Lab Setup**
+1. Open a terminal window
+2. Verify your shell is Bash:
+   ```bash
+   echo $SHELL
+Expected output: /bin/bash or similar
+
+Create a lab directory:
+mkdir job_control_lab && cd job_control_lab
+Task 1: Starting Background Processes
+Subtask 1.1: Launch a Process in Background
+Create a sample long-running process:
+
+sleep 300 &
+The & symbol runs the command in background
+
+Observe the output:
+
+[1] 12345  # [job_number] PID
+Subtask 1.2: Verify Background Job
+Check running jobs:
+jobs
+Expected output:
+[1]+  Running                 sleep 300 &
+Key Concept: The jobs command lists all background jobs in the current shell session.
+
+Task 2: Managing Job States
+Subtask 2.1: Bring Job to Foreground
+Use the job number from jobs output:
+
+fg %1
+The process now runs in foreground
+
+Press Ctrl+Z to suspend the process
+
+Subtask 2.2: Move Job to Background
+Resume suspended job in background:
+bg %1
+Verify with:
+jobs
+Troubleshooting Tip: If you get "no job control" error, ensure you're using Bash and not in a restricted shell.
+
+Task 3: Process Termination
+Subtask 3.1: Graceful Termination
+Find the process ID:
+
+jobs -l
+Shows job numbers with PIDs
+
+Send TERM signal:
+
+kill 12345  # Replace with actual PID
+Subtask 3.2: Force Termination
+For unresponsive processes:
+kill -9 12345
+Subtask 3.3: Verify Termination
+Check job status:
+jobs
+Should show "Terminated" or be absent from list
+Advanced Task: Job Control with Containers
+Start a Podman container in background:
+
+podman run -d --name lab_nginx nginx
+List running containers:
+
+podman ps
+Stop the container (similar to kill):
+
+podman stop lab_nginx
