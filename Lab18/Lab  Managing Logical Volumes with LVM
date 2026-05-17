@@ -1,0 +1,82 @@
+Task 1: Creating Physical Volumes and Volume Groups
+Subtask 1.1: Identify Available Disks
+Before creating PVs, identify available disks:
+
+lsblk
+Expected Output:
+Displays block devices (e.g., /dev/sdb, /dev/sdc).
+
+Subtask 1.2: Create Physical Volumes
+Use pvcreate to initialize disks as PVs:
+
+sudo pvcreate /dev/sdb /dev/sdc
+Verify with:
+
+sudo pvs
+Expected Output:
+Lists PVs with details (e.g., /dev/sdb, /dev/sdc).
+
+Subtask 1.3: Create a Volume Group
+Combine PVs into a VG named my_vg:
+
+sudo vgcreate my_vg /dev/sdb /dev/sdc
+Verify with:
+
+sudo vgs
+Expected Output:
+Shows my_vg with allocated PVs.
+
+Task 2: Allocating and Resizing Logical Volumes
+Subtask 2.1: Create a Logical Volume
+Allocate a 5GB LV named my_lv:
+
+sudo lvcreate -L 5G -n my_lv my_vg
+Verify with:
+
+sudo lvs
+Expected Output:
+Displays my_lv with 5GB size.
+
+Subtask 2.2: Format and Mount the LV
+Format as ext4 and mount:
+
+sudo mkfs.ext4 /dev/my_vg/my_lv
+sudo mkdir /mnt/mylv
+sudo mount /dev/my_vg/my_lv /mnt/mylv
+Verify:
+
+df -h /mnt/mylv
+Expected Output:
+Shows mounted LV with 5GB capacity.
+
+Subtask 2.3: Extend the Logical Volume
+Extend my_lv by 2GB:
+
+sudo lvextend -L +2G /dev/my_vg/my_lv
+sudo resize2fs /dev/my_vg/my_lv
+Verify:
+
+df -h /mnt/mylv
+Expected Output:
+Shows increased size (~7GB).
+
+Task 3: Creating and Managing Snapshots
+Subtask 3.1: Create a Snapshot
+Create a 1GB snapshot of my_lv:
+
+sudo lvcreate -L 1G -s -n my_snapshot /dev/my_vg/my_lv
+Verify:
+
+sudo lvs
+Expected Output:
+Shows my_snapshot under my_vg.
+
+Subtask 3.2: Restore from Snapshot
+Unmount LV, restore, and remount:
+
+sudo umount /mnt/mylv
+sudo lvconvert --merge /dev/my_vg/my_snapshot
+sudo mount /dev/my_vg/my_lv /mnt/mylv
+Expected Output:
+Reverts LV to the state when the snapshot was taken.
+
