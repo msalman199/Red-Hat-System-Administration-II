@@ -1,0 +1,94 @@
+
+## **Task 1: Install and Configure NFS Server and Client**
+
+### **Subtask 1.1: Install NFS Packages**
+**Server Side:**
+1. Update the package repository:
+   ```bash
+   sudo dnf update -y  # For RHEL/CentOS/Fedora
+   # OR
+   sudo apt update -y  # For Debian/Ubuntu
+Install NFS server components:
+sudo dnf install nfs-utils -y  # RHEL/CentOS/Fedora
+# OR
+sudo apt install nfs-kernel-server -y  # Debian/Ubuntu
+Client Side:
+
+Install NFS client packages:
+sudo dnf install nfs-utils -y  # RHEL/CentOS/Fedora
+# OR
+sudo apt install nfs-common -y  # Debian/Ubuntu
+Expected Outcome:
+NFS packages are installed without errors on both systems.
+
+Subtask 1.2: Start and Enable NFS Services
+Server Side:
+
+Start and enable NFS services:
+
+sudo systemctl enable --now nfs-server
+sudo systemctl status nfs-server  # Verify service is active
+Configure the firewall to allow NFS traffic:
+
+sudo firewall-cmd --add-service={nfs,nfs3,mountd,rpc-bind} --permanent
+sudo firewall-cmd --reload
+Expected Outcome:
+NFS services are running, and firewall rules are updated.
+
+Task 2: Export Directories and Mount on Client
+Subtask 2.1: Create and Export Directory on Server
+Create a shared directory:
+
+sudo mkdir -p /mnt/nfs_share
+sudo chown nobody:nobody /mnt/nfs_share  # Set ownership for anonymous access
+sudo chmod 777 /mnt/nfs_share  # Temporary permission for testing
+Edit /etc/exports to define the shared directory:
+
+sudo nano /etc/exports
+Add the following line (replace client_ip with the client's IP or subnet):
+
+/mnt/nfs_share client_ip(rw,sync,no_subtree_check)
+Export the directory:
+
+sudo exportfs -arv
+Expected Outcome:
+The directory /mnt/nfs_share is exported and accessible to the client.
+
+Subtask 2.2: Mount the NFS Share on Client
+Create a mount point on the client:
+
+sudo mkdir -p /mnt/nfs_mount
+Mount the NFS share (replace server_ip with the server's IP):
+
+sudo mount -t nfs server_ip:/mnt/nfs_share /mnt/nfs_mount
+Verify the mount:
+
+df -hT | grep nfs
+Expected Outcome:
+The NFS share is mounted at /mnt/nfs_mount on the client.
+
+Task 3: Optimize NFS for Security and Performance
+Subtask 3.1: Secure NFS Exports
+Edit /etc/exports to restrict access (e.g., read-only for specific clients):
+
+/mnt/nfs_share client_ip(ro,sync,no_root_squash)
+ro: Read-only access.
+no_root_squash: Allows root access (use cautiously).
+Re-export the directory:
+
+sudo exportfs -arv
+Troubleshooting Tip:
+If access is denied, check /var/log/messages for NFS errors.
+
+Subtask 3.2: Automount NFS Share at Boot
+Edit /etc/fstab on the client:
+
+sudo nano /etc/fstab
+Add this line (replace server_ip):
+
+server_ip:/mnt/nfs_share  /mnt/nfs_mount  nfs  defaults  0  0
+Test the fstab entry:
+
+sudo mount -a
+Expected Outcome:
+The NFS share mounts automatically on reboot.
